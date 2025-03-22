@@ -65,6 +65,12 @@ public class MainActivity extends AppCompatActivity {
         spinnerFrom.setSelection(0); // "USD"
         spinnerFrom.setEnabled(false);
 
+        Button btnCompound = findViewById(R.id.btnCompound);
+        btnCompound.setOnClickListener(v -> {
+            startActivity(new Intent(this, CompoundInterestActivity.class));
+        });
+
+
         // Conversão
         btnConvert.setOnClickListener(v -> {
             String from = "USD"; // fixo

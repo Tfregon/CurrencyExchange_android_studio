@@ -23,6 +23,8 @@
         <!-- HistoryActivity declarada aqui -->
         <activity android:name=".view.HistoryActivity" />
 
+        <activity android:name=".view.CompoundInterestActivity" />
+
         <!-- MainActivity declarada como Launcher (tela inicial) -->
         <activity
             android:name=".view.MainActivity"
