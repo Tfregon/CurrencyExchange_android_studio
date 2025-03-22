@@ -46,40 +46,59 @@ public class MainActivity extends AppCompatActivity {
         historyController = new HistoryController(this);
 
         // Redireciona para login caso não esteja logado
-        if(!authController.isUserLoggedIn()){
+        if (!authController.isUserLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
 
-        // Preenche os spinners com moedas fixas
+        // ✅ Define as moedas disponíveis
         String[] currencies = {"USD", "BRL", "EUR", "CAD", "GBP"};
+
+        // ✅ Adapter para os dois spinners
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencies);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerFrom.setAdapter(adapter);
         spinnerTo.setAdapter(adapter);
 
+        // ✅ Fixa o "from" como USD e desabilita interação
+        spinnerFrom.setSelection(0); // "USD"
+        spinnerFrom.setEnabled(false);
+
+        // Conversão
         btnConvert.setOnClickListener(v -> {
-            String from = spinnerFrom.getSelectedItem().toString();
+            String from = "USD"; // fixo
             String to = spinnerTo.getSelectedItem().toString();
             String amountText = inputAmount.getText().toString();
 
-            if(amountText.isEmpty()){
+            if (amountText.isEmpty()) {
                 Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double amount = Double.parseDouble(amountText);
+            if (from.equals(to)) {
+                Toast.makeText(this, "Please select a different target currency", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            conversionController.performConversion(this, from, to, amount, new ConversionController.ConversionResult(){
+            double amount;
+            try {
+                amount = Double.parseDouble(amountText);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            conversionController.performConversion(this, from, to, amount, new ConversionController.ConversionResult() {
                 @Override
-                public void onSuccess(double convertedValue){
-                    txtResult.setText(String.format("%.2f",convertedValue));
+                public void onSuccess(double convertedValue) {
+                    txtResult.setText(String.format("%.2f", convertedValue));
                     historyController.addConversion(new Conversion(from, to, amount, convertedValue, new Date().toString()));
                 }
+
                 @Override
-                public void onFailure(Exception e){
-                    Toast.makeText(MainActivity.this,"Conversion Error!",Toast.LENGTH_SHORT).show();
+                public void onFailure(Exception e) {
+                    Toast.makeText(MainActivity.this, "Conversion Error!", Toast.LENGTH_SHORT).show();
                 }
             });
         });
